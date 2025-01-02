@@ -1,0 +1,36 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      "-O0",
+      "-I",
+      "-Waddress",
+      "-Warray-bounds",
+      "-Wcast-align",
+      "-Wconversion",
+      "-Wfloat-equal",
+      "-Wformat",
+      "-Wimplicit-function-declaration",
+      "-Wmissing-prototypes",
+      "-Wnull-dereference",
+      "-Wshadow",
+      "-Wsign-compare",
+      "-Wstrict-aliasing",
+      "-Wuninitialized",
+      "-Wunused-variable",
+      "-c",
+      "-I",
+      "include",
+      "-o",
+      "build/main.o",
+      "source/main.c"
+    ],
+    "directory": "/home/manoel/GIT/frontier",
+    "file": "/home/manoel/GIT/frontier/source/main.c",
+    "output": "/home/manoel/GIT/frontier/build/main.o"
+  }
+]

@@ -1,0 +1,10 @@
+---
+# Enable all checks for the strictest analysis
+Checks: '*'
+
+# Treat all warnings as errors to enforce strict compliance
+WarningsAsErrors: '*'
+
+# Analyze all files, including headers (modify regex if needed to exclude certain paths)
+HeaderFilterRegex: '.*'
+
