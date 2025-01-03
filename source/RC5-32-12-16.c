@@ -1,3 +1,4 @@
+#include "RC5-32-12-16.h"
 #include <stdint.h>
 
 static const uint8_t BIT32_LEN = 32U;
@@ -10,15 +11,9 @@ static inline uint32_t ROT32L(const uint32_t value,
 static inline uint32_t ROT32R(const uint32_t value,
                                   const uint8_t rot_amount)
 {
+    //NOLINTNEXTLINE(*)
     return (value >> rot_amount) | (value << (uint8_t)(BIT32_LEN - rot_amount));
 }
-
-enum {
-    KEY_WORD_SIZE=4U, // BYTES
-    NUMBER_OF_ROUNDS=12U,
-    SCHEDULE_TABLE_WORD_SIZE=26U, // 2*(NUMBER_OF_ROUNDS + 1)
-
-};
 
 /**
  * @brief Key Expansion
@@ -137,7 +132,7 @@ static void key_schedule(uint32_t key[KEY_WORD_SIZE] , uint32_t key_schedule[SCH
  * @param[in] key
  */
 //NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-void encrypt( uint32_t* const data, uint32_t key[KEY_WORD_SIZE])
+void rc5_encrypt( uint32_t* const data, uint32_t key[KEY_WORD_SIZE])
 {
     
     uint32_t scheduled_keys[SCHEDULE_TABLE_WORD_SIZE];
@@ -174,7 +169,7 @@ void encrypt( uint32_t* const data, uint32_t key[KEY_WORD_SIZE])
  * @param[in] key
  */
 //NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-void decrypt( uint32_t* const data, uint32_t key[KEY_WORD_SIZE])
+void rc5_decrypt( uint32_t* const data, uint32_t key[KEY_WORD_SIZE])
 {
     
     uint32_t scheduled_keys[SCHEDULE_TABLE_WORD_SIZE];
