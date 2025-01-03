@@ -1,4 +1,5 @@
 #include "RC5-32-12-16.h"
+#include "fast_memory.h"
 #include <stdint.h>
 
 static const uint8_t BIT32_LEN = 32U;
@@ -26,9 +27,11 @@ static inline uint32_t ROT32R(const uint32_t value,
  * @param[inout] key_schedule
  */
 //NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-static void key_schedule(uint32_t key[KEY_WORD_SIZE],
+static void key_schedule(uint32_t cipher_key[KEY_WORD_SIZE],
                          uint32_t key_schedule[SCHEDULE_TABLE_WORD_SIZE])
 {
+    uint32_t key[4];
+    fast_memcpy(key, cipher_key, (uint32_t)KEY_WORD_SIZE<<2U);
 
     /**
      * @brief Definition of the Magic Constants
@@ -91,7 +94,7 @@ static void key_schedule(uint32_t key[KEY_WORD_SIZE],
         key[key_index] = ROT32L(key[key_index]+ variable_A + variable_B, variable_A+variable_B);
         variable_B = key[key_index];
 
-        schedule_index = (schedule_index+1)%SCHEDULE_TABLE_WORD_SIZE;
+        schedule_index = (schedule_index+1U)%SCHEDULE_TABLE_WORD_SIZE;
         key_index = (key_index+1U) & 0x3U;
 
 
@@ -102,7 +105,7 @@ static void key_schedule(uint32_t key[KEY_WORD_SIZE],
         key[key_index] = ROT32L(key[key_index]+ variable_A + variable_B, variable_A+variable_B);
         variable_B = key[key_index];
 
-        schedule_index = (schedule_index+1)%SCHEDULE_TABLE_WORD_SIZE;
+        schedule_index = (schedule_index+1U)%SCHEDULE_TABLE_WORD_SIZE;
         key_index = (key_index+1U) & 0x3U;
 
 
@@ -114,15 +117,12 @@ static void key_schedule(uint32_t key[KEY_WORD_SIZE],
         key[key_index] = ROT32L(key[key_index]+ variable_A + variable_B, variable_A+variable_B);
         variable_B = key[key_index];
 
-        schedule_index = (schedule_index+1)%SCHEDULE_TABLE_WORD_SIZE;
+        schedule_index = (schedule_index+1U)%SCHEDULE_TABLE_WORD_SIZE;
         key_index = (key_index+1U) & 0x3U;
 
         ++counter;
     }
     while (counter < SCHEDULE_TABLE_WORD_SIZE);
-
-
-
 
 }
 
@@ -150,18 +150,21 @@ void rc5_encrypt(uint32_t * const data,
     uint16_t index_shifted = 2U;
     uint8_t index = 1U;
 
-    //NOLINTNEXTLINE(altera-unroll-loops)
-    do
+
+loop:
+    variable_A = ROT32L((variable_A ^ variable_B), variable_B) + scheduled_keys[index_shifted];
+    variable_B = ROT32L((variable_B ^ variable_A), variable_A) + scheduled_keys[index_shifted + 1];
+
+    if(index == NUMBER_OF_ROUNDS )
     {
-
-        variable_A = ROT32L((variable_A ^ variable_B), variable_B) + scheduled_keys[index_shifted];
-        variable_B = ROT32L((variable_B ^ variable_A), variable_A) + scheduled_keys[index_shifted + 1];
-
-        ++index;
-        index_shifted = index << 1U;
+        goto exit_setup;
     }
-    while (index <= NUMBER_OF_ROUNDS);
 
+    ++index;
+    index_shifted = index << 1U;
+    goto loop;
+
+exit_setup:
     data[0] = variable_A;
     data[1] = variable_B;
 }
@@ -184,6 +187,7 @@ void rc5_decrypt(uint32_t * const data,
 
     register uint32_t variable_A = 0U;
     register uint32_t variable_B = 0U;
+
     uint16_t index_shifted = (uint16_t) NUMBER_OF_ROUNDS >> 1U;
     uint8_t index = NUMBER_OF_ROUNDS;
 
