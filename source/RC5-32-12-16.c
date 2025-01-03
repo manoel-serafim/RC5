@@ -189,17 +189,18 @@ void rc5_decrypt(uint32_t * const data,
     uint16_t index_shifted = (uint16_t) NUMBER_OF_ROUNDS << 1U;
     uint8_t index = NUMBER_OF_ROUNDS;
 
-    //NOLINTNEXTLINE(altera-unroll-loops)
-    do
-    {
+loop:
         variable_B = ROT32R((variable_B - scheduled_keys[index_shifted+1]), variable_A) ^ variable_A;
         variable_A = ROT32R((variable_A - scheduled_keys[index_shifted]), variable_B) ^ variable_B;
-
+        if(index == 1U)
+        {
+            goto setup_exit;
+        }
         --index;
         index_shifted = index << 1U;
-    }
-    while (index >= 1);
+        goto loop;
 
+setup_exit:
     data[0] = variable_A - scheduled_keys[0];
     data[1] = variable_B - scheduled_keys[1];
 
