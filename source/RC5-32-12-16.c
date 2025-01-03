@@ -1,5 +1,4 @@
 #include "RC5-32-12-16.h"
-#include "fast_memory.h"
 #include <stdint.h>
 
 static const uint8_t BIT32_LEN = 32U;
@@ -30,8 +29,7 @@ static inline uint32_t ROT32R(const uint32_t value,
 static void key_schedule(uint32_t cipher_key[KEY_WORD_SIZE],
                          uint32_t key_schedule[SCHEDULE_TABLE_WORD_SIZE])
 {
-    uint32_t key[4];
-    fast_memcpy(key, cipher_key, (uint32_t)KEY_WORD_SIZE<<2U);
+    uint32_t key[4] = {cipher_key[0], cipher_key[1], cipher_key[2], cipher_key[3]};
 
     /**
      * @brief Definition of the Magic Constants
@@ -153,18 +151,18 @@ void rc5_encrypt(uint32_t * const data,
 
 loop:
     variable_A = ROT32L((variable_A ^ variable_B), variable_B) + scheduled_keys[index_shifted];
-    variable_B = ROT32L((variable_B ^ variable_A), variable_A) + scheduled_keys[index_shifted + 1];
+    variable_B = ROT32L((variable_B ^ variable_A), variable_A) + scheduled_keys[index_shifted + 1U];
 
     if(index == NUMBER_OF_ROUNDS )
     {
-        goto exit_setup;
+        goto setup_exit;
     }
 
     ++index;
     index_shifted = index << 1U;
-    goto loop;
+    goto loop; // ALMOST ALWAYS DOES THE SAME AS A DOWHILE(TRUE), NO NEED FOR CRYING
 
-exit_setup:
+setup_exit:
     data[0] = variable_A;
     data[1] = variable_B;
 }
@@ -185,10 +183,10 @@ void rc5_decrypt(uint32_t * const data,
 
     key_schedule(key, scheduled_keys);
 
-    register uint32_t variable_A = 0U;
-    register uint32_t variable_B = 0U;
+    register uint32_t variable_A = data[0];
+    register uint32_t variable_B = data[1];
 
-    uint16_t index_shifted = (uint16_t) NUMBER_OF_ROUNDS >> 1U;
+    uint16_t index_shifted = (uint16_t) NUMBER_OF_ROUNDS << 1U;
     uint8_t index = NUMBER_OF_ROUNDS;
 
     //NOLINTNEXTLINE(altera-unroll-loops)
@@ -198,14 +196,11 @@ void rc5_decrypt(uint32_t * const data,
         variable_A = ROT32R((variable_A - scheduled_keys[index_shifted]), variable_B) ^ variable_B;
 
         --index;
-        index_shifted = index >> 1U;
+        index_shifted = index << 1U;
     }
     while (index >= 1);
 
-    variable_A = variable_A - scheduled_keys[0];
-    variable_B = variable_B - scheduled_keys[1];
-
-    data[0] = variable_A;
-    data[1] = variable_B;
+    data[0] = variable_A - scheduled_keys[0];
+    data[1] = variable_B - scheduled_keys[1];
 
 }
