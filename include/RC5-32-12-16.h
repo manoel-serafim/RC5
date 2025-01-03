@@ -35,9 +35,12 @@ enum
     SCHEDULE_TABLE_WORD_SIZE = 26U, // 2*(NUMBER_OF_ROUNDS + 1)
 };
 
+void rc5_key_schedule(uint32_t cipher_key[KEY_WORD_SIZE],
+             uint32_t key_schedule[SCHEDULE_TABLE_WORD_SIZE]);
+
 void rc5_encrypt(uint32_t *data,
-                 uint32_t key[KEY_WORD_SIZE]);
+                 uint32_t const scheduled_keys[SCHEDULE_TABLE_WORD_SIZE]);
 void rc5_decrypt(uint32_t *data,
-                 uint32_t key[KEY_WORD_SIZE]);
+                 uint32_t const scheduled_keys[SCHEDULE_TABLE_WORD_SIZE]);
 
 #endif // RC5_32_12_16_H

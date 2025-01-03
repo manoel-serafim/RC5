@@ -26,7 +26,7 @@ static inline uint32_t ROT32R(const uint32_t value,
  * @param[inout] key_schedule
  */
 //NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-static void key_schedule(uint32_t cipher_key[KEY_WORD_SIZE],
+void rc5_key_schedule(uint32_t cipher_key[KEY_WORD_SIZE],
                          uint32_t key_schedule[SCHEDULE_TABLE_WORD_SIZE])
 {
     uint32_t key[4] = {cipher_key[0], cipher_key[1], cipher_key[2], cipher_key[3]};
@@ -131,16 +131,12 @@ static void key_schedule(uint32_t cipher_key[KEY_WORD_SIZE],
  *          S[0...t - 1] has been computed. Here is the encryption algorithm in pseudo-code
  *
  * @param[inout] data
- * @param[in] key
+ * @param[in] scheduled_keys
  */
 //NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 void rc5_encrypt(uint32_t * const data,
-                 uint32_t key[KEY_WORD_SIZE])
+                 uint32_t const scheduled_keys[SCHEDULE_TABLE_WORD_SIZE])
 {
-
-    uint32_t scheduled_keys[SCHEDULE_TABLE_WORD_SIZE];
-
-    key_schedule(key, scheduled_keys);
 
     register uint32_t variable_A = data[0] + scheduled_keys[0];
     register uint32_t variable_B = data[1] + scheduled_keys[1];
@@ -172,16 +168,12 @@ setup_exit:
  * @details The decryption routine is easily derived from the encryption routine
  *
  * @param[inout] data
- * @param[in] key
+ * @param[in] scheduled_keys
  */
 //NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 void rc5_decrypt(uint32_t * const data,
-                 uint32_t key[KEY_WORD_SIZE])
+                 uint32_t const scheduled_keys[SCHEDULE_TABLE_WORD_SIZE])
 {
-
-    uint32_t scheduled_keys[SCHEDULE_TABLE_WORD_SIZE];
-
-    key_schedule(key, scheduled_keys);
 
     register uint32_t variable_A = data[0];
     register uint32_t variable_B = data[1];
