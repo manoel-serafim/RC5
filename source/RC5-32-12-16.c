@@ -37,7 +37,7 @@ static void key_schedule(uint32_t key[KEY_WORD_SIZE] , uint32_t key_schedule[SCH
      *          P32 = 101101111110000i0i01000101i00011 = b7e15163
      *          Q32 = 10011110001101110111100110111001 = 9e3779b9
      */
-    static const uint32_t NUMS_MAGIC_P32 = 0xB7e15163U; //Nothing Up My Sleve constant
+    static const uint32_t NUMS_MAGIC_P32 = 0xB7E15163U; //Nothing Up My Sleve constant
     static const uint32_t NUMS_MAGIC_Q32 = 0x9E3779B9U; //Nothing Up My Sleve constant
     
     /**
@@ -61,12 +61,7 @@ static void key_schedule(uint32_t key[KEY_WORD_SIZE] , uint32_t key_schedule[SCH
     {
         key_schedule[schedule_index] = key_schedule[schedule_index-1U] + NUMS_MAGIC_Q32;
         ++schedule_index;
-        key_schedule[schedule_index] = key_schedule[schedule_index-1U] + NUMS_MAGIC_Q32;
-        ++schedule_index;
-        key_schedule[schedule_index] = key_schedule[schedule_index-1U] + NUMS_MAGIC_Q32;
-        ++schedule_index;
-        key_schedule[schedule_index] = key_schedule[schedule_index-1U] + NUMS_MAGIC_Q32;
-        ++schedule_index;
+        
     }//NOLINTNEXTLINE(altera-id-dependent-backward-branch)
     while(schedule_index < (uint8_t)SCHEDULE_TABLE_WORD_SIZE);
 
@@ -80,8 +75,10 @@ static void key_schedule(uint32_t key[KEY_WORD_SIZE] , uint32_t key_schedule[SCH
      */
     schedule_index =0U;
     uint8_t key_index = 0U;
+
     uint32_t variable_A = 0U;
     uint32_t variable_B = 0U;
+    
     uint8_t counter = 0U;
 
     //NOLINTNEXTLINE(altera-unroll-loops)
@@ -96,6 +93,8 @@ static void key_schedule(uint32_t key[KEY_WORD_SIZE] , uint32_t key_schedule[SCH
         schedule_index = (schedule_index+1)%SCHEDULE_TABLE_WORD_SIZE;
         key_index = (key_index+1U) & 0x3U;
 
+
+
         key_schedule[schedule_index] = ROT32L(key_schedule[schedule_index] + variable_A + variable_B, 3U);
         variable_A = key_schedule[schedule_index];
 
@@ -104,6 +103,9 @@ static void key_schedule(uint32_t key[KEY_WORD_SIZE] , uint32_t key_schedule[SCH
 
         schedule_index = (schedule_index+1)%SCHEDULE_TABLE_WORD_SIZE;
         key_index = (key_index+1U) & 0x3U;
+
+
+
 
         key_schedule[schedule_index] = ROT32L(key_schedule[schedule_index] + variable_A + variable_B, 3U);
         variable_A = key_schedule[schedule_index];
@@ -140,7 +142,7 @@ void rc5_encrypt( uint32_t* const data, uint32_t key[KEY_WORD_SIZE])
     key_schedule(key, scheduled_keys);
     
     register uint32_t variable_A = data[0] + scheduled_keys[0];
-    register uint32_t variable_B = data[1] + scheduled_keys[0];
+    register uint32_t variable_B = data[1] + scheduled_keys[1];
 
     uint16_t index_shifted = 2U;
     uint8_t index = 1U;
