@@ -1,7 +1,7 @@
 #include "fast_memory.h"
 #include <stdint.h>
 
-
+//NOLINTNEXTLINE(bugprone-easily-swappable-parameter)
 void fast_memcpy(void * const restrict dest, const void * const restrict src, uint32_t n_bytes_to_cpy)
 {
 	register uint8_t *dest_register = (uint8_t *)dest;
